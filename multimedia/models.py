@@ -6,7 +6,7 @@ from django.utils.timezone import utc
 
 from armstrong.apps.content.models import Content
 
-UPLOAD_PATH = getattr(settings, 'CM_IMAGE_UPLOAD_PATH', 'cm/mutlimedia/')
+UPLOAD_PATH = getattr(settings, 'TASTY_IMAGE_UPLOAD_PATH', 'tasty/mutlimedia/%Y-%m')
 CONTENT_TYPES = (
   ('audio', 'Audio'),
   ('doc', 'Document'),
@@ -52,7 +52,7 @@ class EmbeddedContent (Content):
 class Podcast (Content):
   category = models.CharField(max_length=255)
   subtitle = models.CharField('iTunes Subtitle', max_length=255, blank=True, null=True)
-  image = models.ImageField(blank=True, null=True, upload_to='cm_multimedia/podcast')
+  image = models.ImageField(blank=True, null=True, upload_to=UPLOAD_PATH)
   keywords = models.CharField(max_length=255, blank=True, null=True)
   
   author = models.CharField(max_length=255)

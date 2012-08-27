@@ -13,6 +13,7 @@ setup(
     packages = [
       'multimedia',
       'multimedia.migrations',
+      'multimedia.templatetags'
     ],
     include_package_data = True,
 )

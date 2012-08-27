@@ -8,15 +8,52 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'EmbeddedContent'
-        db.create_table('cm_multimedia_embeddedcontent', (
-            ('content_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['content.Content'], unique=True, primary_key=True)),
+        # Adding model 'Publisher'
+        db.create_table('multimedia_publisher', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=175)),
+            ('url', self.gf('django.db.models.fields.URLField')(max_length=200, null=True, blank=True)),
+            ('slug', self.gf('django.db.models.fields.SlugField')(max_length=50)),
         ))
-        db.send_create_signal('cm_multimedia', ['EmbeddedContent'])
+        db.send_create_signal('multimedia', ['Publisher'])
+
+        # Adding model 'EmbeddedContent'
+        db.create_table('multimedia_embeddedcontent', (
+            ('content_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['content.Content'], unique=True, primary_key=True)),
+            ('url', self.gf('django.db.models.fields.URLField')(max_length=200, null=True, blank=True)),
+            ('file', self.gf('django.db.models.fields.files.FileField')(max_length=100, null=True, blank=True)),
+            ('code', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+            ('ctype', self.gf('django.db.models.fields.CharField')(max_length=25)),
+            ('duration', self.gf('django.db.models.fields.CharField')(max_length=25, null=True, blank=True)),
+            ('keywords', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('publisher', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['multimedia.Publisher'], null=True, blank=True)),
+            ('migrated_from', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+        ))
+        db.send_create_signal('multimedia', ['EmbeddedContent'])
+
+        # Adding model 'Podcast'
+        db.create_table('multimedia_podcast', (
+            ('content_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['content.Content'], unique=True, primary_key=True)),
+            ('category', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('subtitle', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('image', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
+            ('keywords', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('author', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('author_email', self.gf('django.db.models.fields.EmailField')(max_length=255)),
+        ))
+        db.send_create_signal('multimedia', ['Podcast'])
+
 
     def backwards(self, orm):
+        # Deleting model 'Publisher'
+        db.delete_table('multimedia_publisher')
+
         # Deleting model 'EmbeddedContent'
-        db.delete_table('cm_multimedia_embeddedcontent')
+        db.delete_table('multimedia_embeddedcontent')
+
+        # Deleting model 'Podcast'
+        db.delete_table('multimedia_podcast')
+
 
     models = {
         'arm_access.accessobject': {
@@ -65,10 +102,6 @@ class Migration(SchemaMigration):
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
-        'cm_multimedia.embeddedcontent': {
-            'Meta': {'object_name': 'EmbeddedContent', '_ormbases': ['content.Content']},
-            'content_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['content.Content']", 'unique': 'True', 'primary_key': 'True'})
-        },
         'content.content': {
             'Meta': {'object_name': 'Content'},
             'access': ('armstrong.core.arm_access.fields.AccessField', [], {}),
@@ -91,6 +124,35 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
+        'multimedia.embeddedcontent': {
+            'Meta': {'object_name': 'EmbeddedContent', '_ormbases': ['content.Content']},
+            'code': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'content_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['content.Content']", 'unique': 'True', 'primary_key': 'True'}),
+            'ctype': ('django.db.models.fields.CharField', [], {'max_length': '25'}),
+            'duration': ('django.db.models.fields.CharField', [], {'max_length': '25', 'null': 'True', 'blank': 'True'}),
+            'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'keywords': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'migrated_from': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'publisher': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['multimedia.Publisher']", 'null': 'True', 'blank': 'True'}),
+            'url': ('django.db.models.fields.URLField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'})
+        },
+        'multimedia.podcast': {
+            'Meta': {'ordering': "('title',)", 'object_name': 'Podcast', '_ormbases': ['content.Content']},
+            'author': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'author_email': ('django.db.models.fields.EmailField', [], {'max_length': '255'}),
+            'category': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'content_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['content.Content']", 'unique': 'True', 'primary_key': 'True'}),
+            'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'keywords': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'subtitle': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
+        },
+        'multimedia.publisher': {
+            'Meta': {'ordering': "('name',)", 'object_name': 'Publisher'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '175'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '50'}),
+            'url': ('django.db.models.fields.URLField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'})
+        },
         'sites.site': {
             'Meta': {'ordering': "('domain',)", 'object_name': 'Site', 'db_table': "'django_site'"},
             'domain': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
@@ -112,4 +174,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['cm_multimedia']
+    complete_apps = ['multimedia']

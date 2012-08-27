@@ -4,5 +4,4 @@
 local_settings.py
 dist
 build
-culturemap_multimedia.egg-info
-
+tasty_multimedia.egg-info
